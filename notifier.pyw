@@ -1,6 +1,5 @@
 import gapy
-import json
-import os
+import json, os, sys
 from requests.exceptions import ConnectionError
 import time
 
@@ -27,11 +26,11 @@ webbrowser.register('firefox', None, webbrowser.BackgroundBrowser("C://Program F
 
 #win10toast
 from toaster import ToastNotifier
-
 toaster = ToastNotifier()
 
 print("Program Start!")
 
+####################################################################################################
 
 class Gaper():
     def __init__(self, user):
@@ -63,8 +62,14 @@ if os.path.exists("idlist.list"):
         idlist = [int(i) for i in file.read().split("\n") if i !=""]
 
 #get the credentials
-with open("credentials.txt", "r") as file:
-    usr, psw = file.read().split("\n")[:2]
+cred_path = "credentials.txt"
+if os.path.exists(cred_path):
+    with open(cred_path, "r") as file:
+        usr, psw = file.read().split("\n")[:2]
+else:
+    with open(cred_path, "w") as file:
+        file.write("username\npassword")
+    sys.exit()
 
 #create a user here
 u = gapy.User.create(usr,psw)
