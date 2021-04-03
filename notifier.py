@@ -3,6 +3,8 @@ import json, os, sys
 from requests.exceptions import ConnectionError
 import time
 
+for_exe = True
+
 ############################
 #check if already running
 # import psutil    
@@ -36,7 +38,10 @@ if not skip:
         startup_dir = "C:/Users/"+os.getlogin()+"/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/"
         path = os.path.join(startup_dir+"notifier.lnk")
         wDir = os.getcwd()+"\\"
-        target = wDir + os.path.basename(__file__)
+        if for_exe:
+            target = wDir + "notifier.exe"
+        else:
+            target = wDir + os.path.basename(__file__)
         icon = target
         shell = Dispatch('WScript.Shell')
         shortcut = shell.CreateShortCut(path)
