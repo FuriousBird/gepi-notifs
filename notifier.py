@@ -49,8 +49,9 @@ if not skip:
         shortcut.WorkingDirectory = wDir
         shortcut.IconLocation = icon
         shortcut.save()
-
-    makeshortcut()
+    
+    if for_exe(): #we don't want it to start on launch on a developpement computer
+        makeshortcut()
 
 ####################################################################
 
