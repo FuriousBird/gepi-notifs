@@ -3,8 +3,54 @@ import json, os, sys
 from requests.exceptions import ConnectionError
 import time
 
+############################
+#check if already running
+# import psutil    
+# "someProgram" in (p.name() for p in psutil.process_iter())
+############################
+
+#necessary both for idle time and admin rights start
+from ctypes import windll
+
+###################################################################################
+#before anything check if file autoruns at windows start
+# import sys --> Already Imported
+
+def is_admin():
+    try:
+        return windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+skip=False
+startup_dir = "C:/Users/"+os.getlogin()+"/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/"
+if os.path.exists(startup_dir+"notifier.lnk"):
+    skip = True
+
+if not skip:
+
+    import winshell # also needs os but already imported
+    from win32com.client import Dispatch
+
+    def makeshortcut():
+        startup_dir = "C:/Users/"+os.getlogin()+"/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/"
+        path = os.path.join(startup_dir+"notifier.lnk")
+        wDir = os.getcwd()+"\\"
+        target = wDir + os.path.basename(__file__)
+        icon = target
+        shell = Dispatch('WScript.Shell')
+        shortcut = shell.CreateShortCut(path)
+        shortcut.Targetpath = target
+        shortcut.WorkingDirectory = wDir
+        shortcut.IconLocation = icon
+        shortcut.save()
+
+    makeshortcut()
+
+####################################################################
+
 #idle time
-from ctypes import Structure, windll, c_uint, sizeof, byref
+from ctypes import Structure, c_uint, sizeof, byref
 
 class LASTINPUTINFO(Structure):
     _fields_ = [
