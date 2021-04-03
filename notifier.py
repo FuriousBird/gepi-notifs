@@ -18,39 +18,44 @@ from ctypes import windll
 #before anything check if file autoruns at windows start
 # import sys --> Already Imported
 
-def is_admin():
-    try:
-        return windll.shell32.IsUserAnAdmin()
-    except:
+import winshell # also needs os but already imported
+from win32com.client import Dispatch
+
+def read_shortcut():
+    startup_dir = "C:/Users/"+os.getlogin()+"/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/"
+    shell = Dispatch("WScript.Shell")
+    shortcut = shell.CreateShortCut(startup_dir+"notifier.lnk")
+    wDir = os.getcwd()+"\\"
+    if shortcut.WorkingDirectory == wDir:
+        return True
+    else:
         return False
+
+def makeshortcut():
+    startup_dir = "C:/Users/"+os.getlogin()+"/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/"
+    path = os.path.join(startup_dir+"notifier.lnk")
+    
+    wDir = os.getcwd()+"\\"
+    if for_exe:
+        target = wDir + "notifier.exe"
+    else:
+        target = wDir + os.path.basename(__file__)
+    icon = target
+    shell = Dispatch('WScript.Shell')
+    shortcut = shell.CreateShortCut(path)
+    shortcut.Targetpath = target
+    shortcut.WorkingDirectory = wDir
+    shortcut.IconLocation = icon
+    shortcut.save()
 
 skip=False
 startup_dir = "C:/Users/"+os.getlogin()+"/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/"
 if os.path.exists(startup_dir+"notifier.lnk"):
-    skip = True
+    if read_shortcut():
+        skip = True
 
 if not skip:
-
-    import winshell # also needs os but already imported
-    from win32com.client import Dispatch
-
-    def makeshortcut():
-        startup_dir = "C:/Users/"+os.getlogin()+"/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup/"
-        path = os.path.join(startup_dir+"notifier.lnk")
-        wDir = os.getcwd()+"\\"
-        if for_exe:
-            target = wDir + "notifier.exe"
-        else:
-            target = wDir + os.path.basename(__file__)
-        icon = target
-        shell = Dispatch('WScript.Shell')
-        shortcut = shell.CreateShortCut(path)
-        shortcut.Targetpath = target
-        shortcut.WorkingDirectory = wDir
-        shortcut.IconLocation = icon
-        shortcut.save()
-    
-    if for_exe(): #we don't want it to start on launch on a developpement computer
+    if for_exe: #we don't want it to start on launch on a developpement computer
         makeshortcut()
 
 ####################################################################
